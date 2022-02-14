@@ -6,6 +6,7 @@ class MarvelService {
     _apiKey = 'apikey=18b4ecc9bdc0ed211ad880b5696d48c1';
 
 
+
     
      getResource = async (url) => {
         let res = await fetch(url);
@@ -17,8 +18,8 @@ class MarvelService {
         return await res.json();
     }
 
-    getAllCharacters = async (limit) => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=${limit}&offset=210&${this._apiKey}`);
+    getAllCharacters = async (offset) => {
+        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`);
         return res.data.results.map(this._transformCharacter); // Каждый отдельный объект по порядку будет браться из полученных данных
     }
 
@@ -34,7 +35,8 @@ class MarvelService {
             description: res.description ? res.description + '...' : 'Описание отсутствует',
             thumbnail: res.thumbnail.path + '.' + res.thumbnail.extension,
             homepage: res.urls[0].url,
-            wiki: res.urls[1].url
+            wiki: res.urls[1].url,
+            comics: res.comics.items
         }
     }
 }

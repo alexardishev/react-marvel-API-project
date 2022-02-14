@@ -95,7 +95,6 @@ class RandomChar extends Component {
 
 const View = (props) => {
     const {char, prop} = props
-    console.log(props)
     const strDesc = String(char.description)
 
 

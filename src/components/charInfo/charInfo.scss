@@ -21,10 +21,16 @@
         display: grid;
         grid-template-columns: 150px auto;
         column-gap: 25px;
-        img {
+        &_propCover {
             width: 150px;
             height: 150px;
             object-fit: cover;
+        }
+    
+        &_propContain {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
         }
     }
     &__btns {
@@ -61,5 +67,9 @@
         line-height: 24px;
         text-align: center;
     }
+
+}
+
+.randomchar {
 
 }

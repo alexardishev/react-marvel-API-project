@@ -5,7 +5,7 @@ import ErrorMessage from '../errorMessage/errorMessage';
 
 
 import './charList.scss';
-import abyss from '../../resources/img/abyss.jpg';
+
 
 class CharList extends Component {
     constructor(props) {
@@ -14,7 +14,8 @@ class CharList extends Component {
             charList: [],
             loading: true,
             error: false,
-            limit: 9
+            offset: 210,
+            charEnded: false
         }
     }
 
@@ -25,29 +26,37 @@ class CharList extends Component {
     }
 
     updateListChar() {
-        this.marvelService.getAllCharacters(this.state.limit).
-        then(res => this.setState({charList: res.slice(this.state.limit - 9), loading: false, limit: this.state.limit + 9}))
+        if(this.state.charList.length < 9) {
+            this.setState({charEnded: true});
+        }
+
+        this.setState({loading:true})
+        this.marvelService.getAllCharacters(this.state.offset).
+        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9}))
     }
     getListChar() {
-        this.marvelService.getAllCharacters(this.state.limit).
-        then(res => this.setState({charList: res, loading: false, limit: this.state.limit + 9}))
+        this.marvelService.getAllCharacters(this.state.offset).
+        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9}))
 
     }
 
 render() {
-    const {charList, loading,limit} = this.state;
+    const {charList, loading,offset, charEnded} = this.state;
     const {onCharSelected} = this.props;
 
     const dataForView = charList;
     const spinner = loading ? <Spinner/> : null
-    const content = !(loading && limit) ? <View charList={dataForView} onCharSelected={onCharSelected}/> : null
+    const content = !(loading && offset) ? <View charList={dataForView} onCharSelected={onCharSelected}/> : null
     return (
         <div className="char__list">
             <ul className="char__grid">
               {spinner}
               {content}
             </ul>
-            <button onClick={()=> {this.updateListChar()}} className="button button__main button__long">
+            <button onClick={()=> {this.updateListChar()}} 
+            className="button button__main button__long"
+            disabled={loading}
+            style={{'display': charEnded ? 'none' : 'block'}}>
                 <div className="inner">load more</div>
             </button>
         </div>
@@ -59,8 +68,6 @@ render() {
 
 const View = ({charList, onCharSelected}) => {
 
-    console.log(charList)
-    console.log(onCharSelected);
     const elements = charList.map((item)=> {
         const imgPath = item.thumbnail
         const match = imgPath.match(/available/ig)

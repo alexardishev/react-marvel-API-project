@@ -40,3 +40,13 @@
         color: #fff;
     }
 }
+
+.randomchar {
+    &__propCover {
+        object-fit: cover;
+    }
+
+    &__propContain {
+        object-fit: contain;
+    }
+}
