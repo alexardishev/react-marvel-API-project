@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/errorMessage';
+
 
 
 import './charList.scss';
@@ -26,13 +26,11 @@ class CharList extends Component {
     }
 
     updateListChar() {
-        if(this.state.charList.length < 9) {
-            this.setState({charEnded: true});
-        }
+
 
         this.setState({loading:true})
         this.marvelService.getAllCharacters(this.state.offset).
-        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9}))
+        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9, charEnded: res.length < 9 ? true : false}))
     }
     getListChar() {
         this.marvelService.getAllCharacters(this.state.offset).
