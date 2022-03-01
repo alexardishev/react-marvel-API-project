@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 
@@ -15,7 +15,7 @@ class CharList extends Component {
             loading: true,
             error: false,
             offset: 210,
-            charEnded: false
+            charEnded: false,
         }
     }
 
@@ -40,11 +40,11 @@ class CharList extends Component {
 
 render() {
     const {charList, loading,offset, charEnded} = this.state;
-    const {onCharSelected} = this.props;
+    const {onCharSelected, selectedChar} = this.props;
 
     const dataForView = charList;
     const spinner = loading ? <Spinner/> : null
-    const content = !(loading && offset) ? <View charList={dataForView} onCharSelected={onCharSelected}/> : null
+    const content = !(loading && offset) ? <View charList={dataForView} onCharSelected={onCharSelected} selectedChar={selectedChar}/> : null
     return (
         <div className="char__list">
             <ul className="char__grid">
@@ -64,29 +64,52 @@ render() {
 
 }
 
-const View = ({charList, onCharSelected}) => {
+class View extends Component {
+ 
 
-    const elements = charList.map((item)=> {
-        const imgPath = item.thumbnail
-        const match = imgPath.match(/available/ig)
-        const prop = match ? "randomchar__img randomchar__propConatain" : "randomchar__img randomchar__propCover"
-        return (
-        <li 
-            className="char__item" 
-            key={item.id}
-            onClick={() => onCharSelected(item.id)}>
-            <img className={prop} src={item.thumbnail} alt="abyss"/>
-            <div className="char__name">{item.name}</div>
-        </li>
+    itemRefs = [];
 
-        )
-    })
+
+    setRef = (elem) => {
+        this.myRef = elem
+        this.itemRefs.push(elem);
+    }
+
+    addClassSelected = (id) => {
+        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
+        this.itemRefs[id].classList.add('char__item_selected');
+        this.itemRefs[id].focus();
+    }
     
-    return (
-        <>
-    {elements}
-    </>
-    )
+
+    render() {
+        console.log(this.itemRefs)
+        const {charList, onCharSelected} = this.props
+        const elements = charList.map((item, i)=> {
+            const imgPath = item.thumbnail
+            const match = imgPath.match(/available/ig)
+            const prop = match ? "randomchar__img randomchar__propConatain" : "randomchar__img randomchar__propCover"
+            return (
+            <li ref={this.setRef}
+                className="char__item" 
+                key={item.id}
+                onClick={() => {
+                onCharSelected(item.id)
+                this.addClassSelected(i)}}>
+                <img className={prop} src={item.thumbnail} alt="abyss"/>
+                <div className="char__name">{item.name}</div>
+            </li>
+    
+            )
+        })
+        
+        return (
+            <>
+        {elements}
+        </>
+        )
+    }
+
 }
 
 export default CharList;

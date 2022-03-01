@@ -102,7 +102,7 @@ class CharInfo extends Component {
 
 const View = ({char, prop, newComics}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
-    console.log(newComics)
+
 
     return (
         <>
