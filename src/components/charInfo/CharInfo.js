@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import {useState, useEffect} from 'react';
 import PropTypes from 'prop-types'
 
 import Spinner from '../spinner/Spinner';
@@ -10,78 +10,72 @@ import MarvelService from '../../services/MarvelService';
 import './charInfo.scss';
 import thor from '../../resources/img/thor.jpeg';
 
-class CharInfo extends Component {
+const CharInfo= (props) => {
 
-    state = {
-        char: null,
-        loading: false,
-        error: false,
-        img: '',
-        clazz: '',
-        full: false
-    }
+    const [char, setChar] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const [img, setImg] = useState('');
+    const [clazz, setClazz] = useState('');
+    const [full, setFull] = useState(false);
 
 
-    marvelService = new MarvelService();
+   const marvelService = new MarvelService();
+
+    useEffect(() => {
+        updateChar();
+    }, [])
+
+    useEffect(() => {
+        updateChar();
+    }, [props.charId])
 
 
-    componentDidMount() {
-        this.updateChar();
-        
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-            if(prevProps.charId != this.props.charId) {
-                this.updateChar();
-
-            
-            }
-    }
-
-
-    updateChar = () => {
-        const {charId} = this.props;
+  const  updateChar = () => {
+        const {charId} = props;
         if(!charId) {
             return;
         }
-        this.onCharLoading();
+        onCharLoading();
 
-        this.marvelService.
+        marvelService.
         getCharacter(charId)
-        .then(this.onCharLoaded)
-        .catch(this.onError)
+        .then(onCharLoaded)
+        .catch(onError)
 
 
 
     }
 
-    onFullList = () => {
-        this.setState({full: !this.state.full})
+   const onFullList = () => {
+       setFull(full => !full);
     }
-    onCharLoaded = (char) => {
+    const onCharLoaded = (char) => {
         const imgPath = char.thumbnail
         const match = imgPath.match(/available/ig)
         const prop = match ? "char__basics_propContain" : "char__basics_propCover"
-        this.setState({char, loading: false, img: char.thumbnail, clazz: prop, full: false})
+        setChar(char);
+        setLoading(false);
+        setImg(char.thumbnail);
+        setClazz(prop);
+        setFull(false);
 
     }
 
-    onError = () => {
-        this.setState({loading: false, error: true})
+  const onError = () => {
+        setLoading(false);
+        setError(true);
     }
 
-    onCharLoading = () => {
-        this.setState({loading: true})
+   const onCharLoading = () => {
+       setLoading(true);
     }
 
-   render () {
     
 
-
-    const {char, loading, error, clazz, full} = this.state;
     const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
     const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
-    const button =  char ? char.comics.length > 10 ?  <button onClick={this.onFullList}>Развернуть больше</button> : null : null;
+    const button =  char ? char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null : null;
     const skeleton = char || loading || error ? null : <Skeleton/>
     const errorMessage = error ? <ErrorMessage/> : null;
     const spinner = loading ? <Spinner/> : null;
@@ -97,7 +91,7 @@ class CharInfo extends Component {
             {button}
         </div>
     )
-   }
+   
 }
 
 const View = ({char, prop, newComics}) => {

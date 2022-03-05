@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 
@@ -7,40 +7,45 @@ import Spinner from '../spinner/Spinner';
 import './charList.scss';
 
 
-class CharList extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            charList: [],
-            loading: true,
-            error: false,
-            offset: 210,
-            charEnded: false,
-        }
+const CharList = (props) => {
+
+    const [charList, setCharList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false)
+    const [offset, setOffset] = useState(210)
+    const [charEnded, setCharEnded] = useState(false);
+
+
+
+   const marvelService = new MarvelService();
+
+   useEffect(() => {
+    getListChar();
+   }, [])
+
+
+   const updateListChar= () => {
+        setLoading(true);
+        marvelService.getAllCharacters(offset).
+        then(res => {
+            setCharList(res);
+            setLoading(false);
+            setOffset(offset => offset + 9)
+            setCharEnded(res.length < 9 ? true : false)
+        })
     }
 
-    marvelService = new MarvelService();
-
-    componentDidMount() {
-        this.getListChar();
-    }
-
-    updateListChar() {
-
-
-        this.setState({loading:true})
-        this.marvelService.getAllCharacters(this.state.offset).
-        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9, charEnded: res.length < 9 ? true : false}))
-    }
-    getListChar() {
-        this.marvelService.getAllCharacters(this.state.offset).
-        then(res => this.setState({charList: res, loading: false, offset: this.state.offset + 9}))
+   const getListChar = () => {
+        marvelService.getAllCharacters(offset).
+        then(res => {
+            setCharList(res);
+            setLoading(false);
+            setOffset(offset => offset + 9)
+        })
 
     }
 
-render() {
-    const {charList, loading,offset, charEnded} = this.state;
-    const {onCharSelected, selectedChar} = this.props;
+    const {onCharSelected, selectedChar} = props;
 
     const dataForView = charList;
     const spinner = loading ? <Spinner/> : null
@@ -51,7 +56,7 @@ render() {
               {spinner}
               {content}
             </ul>
-            <button onClick={()=> {this.updateListChar()}} 
+            <button onClick={()=> {updateListChar()}} 
             className="button button__main button__long"
             disabled={loading}
             style={{'display': charEnded ? 'none' : 'block'}}>
@@ -59,43 +64,38 @@ render() {
             </button>
         </div>
     )
+
+
+
 }
 
-
-}
-
-class View extends Component {
+const View = (props) => {
  
 
-    itemRefs = [];
+    const itemRefs = useRef([]);
 
 
-    setRef = (elem) => {
-        this.myRef = elem
-        this.itemRefs.push(elem);
-    }
-
-    addClassSelected = (id) => {
-        this.itemRefs.forEach(item => item.classList.remove('char__item_selected'));
-        this.itemRefs[id].classList.add('char__item_selected');
-        this.itemRefs[id].focus();
+    const addClassSelected = (id) => {
+        console.log(itemRefs);
+        itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
+        itemRefs.current[id].classList.add('char__item_selected');
+        itemRefs.current[id].focus();
     }
     
 
-    render() {
-        console.log(this.itemRefs)
-        const {charList, onCharSelected} = this.props
+
+        const {charList, onCharSelected} = props
         const elements = charList.map((item, i)=> {
             const imgPath = item.thumbnail
             const match = imgPath.match(/available/ig)
             const prop = match ? "randomchar__img randomchar__propConatain" : "randomchar__img randomchar__propCover"
             return (
-            <li ref={this.setRef}
+            <li ref={el => itemRefs.current[i] = el}
                 className="char__item" 
                 key={item.id}
                 onClick={() => {
                 onCharSelected(item.id)
-                this.addClassSelected(i)}}>
+                addClassSelected(i)}}>
                 <img className={prop} src={item.thumbnail} alt="abyss"/>
                 <div className="char__name">{item.name}</div>
             </li>
@@ -108,7 +108,6 @@ class View extends Component {
         {elements}
         </>
         )
-    }
 
 }
 
