@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import {useState, useEffect} from 'react';
 import MarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
@@ -9,59 +9,59 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 
 
-class RandomChar extends Component {
+const RandomChar = (props) => {
+    const [char, setChar] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [img, setImg] = useState('');
 
-    state = {
-        char: {},
-        loading: true,
-        error: false,
-        img: ''
+
+
+  const  marvelService = new MarvelService();
+
+    useEffect(() => {
+        updateChar();
+    }, [])
+
+
+
+   const onCharLoaded = (res) => {
+       setChar(char => res);
+       setLoading(false);
+       setImg(res.thumbnail);
+    }
+
+    const onError = () => {
+        setLoading(false);
+        setError(true);
+    }
+
+    const tryIt = () => {
+        setLoading(true);
+        setError(false);
+        updateChar();
+
+
     }
 
 
-    marvelService = new MarvelService();
-
-    componentDidMount() {
-        this.updateChar();
-        // this.timerId = setInterval(this.updateChar, 3000);
-        // this.setState({img: this.state.char.thumbnail})
-
-    }
-
-
-    onCharLoaded = (char) => {
-        this.setState({char, loading: false, img: char.thumbnail})
-    }
-
-    onError = () => {
-        this.setState({loading: false, error: true})
-    }
-
-    tryIt = () => {
-        this.setState({loading: true, error: false})
-        this.updateChar();
-
-
-    }
-
-
-    updateChar = () => {
+   const updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         // const id = 1
 
-        this.marvelService
+        marvelService
         .getCharacter(id)
-        .then(this.onCharLoaded)
-        .catch(this.onError);
+        .then(res => onCharLoaded(res))
+        .catch(onError);
         
 
     }
 
 
 
-    render() {
-        const {char, loading, error} = this.state;
-        const imgPath = this.state.img
+
+
+        const imgPath = img
         const match = imgPath.match(/available/ig)
         const prop = match ? "randomchar__img randomchar__propConatain" : "randomchar__img randomchar__propCover"
         const errorMessage = error ? <ErrorMessage/> : null;
@@ -83,7 +83,7 @@ class RandomChar extends Component {
                         Or choose another one
                     </p>
                     <button className="button button__main">
-                        <div onClick={this.tryIt} className="inner">try it</div>
+                        <div onClick={tryIt} className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
@@ -91,7 +91,6 @@ class RandomChar extends Component {
         )
     }
 
-}
 
 const View = (props) => {
     const {char, prop} = props

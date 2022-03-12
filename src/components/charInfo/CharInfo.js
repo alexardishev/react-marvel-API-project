@@ -8,7 +8,6 @@ import MarvelService from '../../services/MarvelService';
 
 
 import './charInfo.scss';
-import thor from '../../resources/img/thor.jpeg';
 
 const CharInfo= (props) => {
 
@@ -75,7 +74,7 @@ const CharInfo= (props) => {
 
     const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
     const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
-    const button =  char ? char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null : null;
+    const button =  char && char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null;
     const skeleton = char || loading || error ? null : <Skeleton/>
     const errorMessage = error ? <ErrorMessage/> : null;
     const spinner = loading ? <Spinner/> : null;
