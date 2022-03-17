@@ -70,7 +70,6 @@ const CharInfo= (props) => {
        setLoading(true);
     }
 
-    
 
     const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
     const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
