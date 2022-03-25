@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import Skeleton from '../skeleton/Skeleton';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 
 import './charInfo.scss';
@@ -12,14 +12,14 @@ import './charInfo.scss';
 const CharInfo= (props) => {
 
     const [char, setChar] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+    // const [loading, setLoading] = useState(false);
+    // const [error, setError] = useState(false);
     const [img, setImg] = useState('');
     const [clazz, setClazz] = useState('');
     const [full, setFull] = useState(false);
 
 
-   const marvelService = new MarvelService();
+   const {loading, error, getCharacter, clearError} = useMarvelService()
 
     useEffect(() => {
         updateChar();
@@ -35,12 +35,12 @@ const CharInfo= (props) => {
         if(!charId) {
             return;
         }
-        onCharLoading();
+        // onCharLoading();
 
-        marvelService.
+        // marvelService.
+        clearError();
         getCharacter(charId)
-        .then(onCharLoaded)
-        .catch(onError)
+        .then(onCharLoaded);
 
 
 
@@ -54,21 +54,21 @@ const CharInfo= (props) => {
         const match = imgPath.match(/available/ig)
         const prop = match ? "char__basics_propContain" : "char__basics_propCover"
         setChar(char);
-        setLoading(false);
+        // setLoading(false);
         setImg(char.thumbnail);
         setClazz(prop);
         setFull(false);
 
     }
 
-  const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
+//   const onError = () => {
+//         setLoading(false);
+//         setError(true);
+//     }
 
-   const onCharLoading = () => {
-       setLoading(true);
-    }
+//    const onCharLoading = () => {
+//        setLoading(true);
+//     }
 
 
     const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;

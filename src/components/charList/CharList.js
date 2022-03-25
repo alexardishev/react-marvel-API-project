@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 
 
@@ -10,14 +10,14 @@ import './charList.scss';
 const CharList = (props) => {
 
     const [charList, setCharList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false)
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(false)
     const [offset, setOffset] = useState(210)
     const [charEnded, setCharEnded] = useState(false);
 
 
 
-   const marvelService = new MarvelService();
+   const {loading, error, getAllCharacters} = useMarvelService();
 
    useEffect(() => {
     getListChar();
@@ -25,21 +25,20 @@ const CharList = (props) => {
 
 
    const updateListChar= () => {
-        setLoading(true);
-        marvelService.getAllCharacters(offset).
+        // setLoading(true);
+        getAllCharacters(offset).
         then(res => {
             setCharList(res);
-            setLoading(false);
             setOffset(offset => offset + 9)
             setCharEnded(res.length < 9 ? true : false)
         })
     }
 
    const getListChar = () => {
-        marvelService.getAllCharacters(offset).
+        getAllCharacters(offset).
         then(res => {
             setCharList(res);
-            setLoading(false);
+            // setLoading(false);
             setOffset(offset => offset + 9)
         })
 

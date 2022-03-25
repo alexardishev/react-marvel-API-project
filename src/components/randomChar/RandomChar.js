@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 
@@ -11,13 +11,10 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = (props) => {
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    // const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState(false);
     const [img, setImg] = useState('');
-
-
-
-  const  marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -27,32 +24,17 @@ const RandomChar = (props) => {
 
    const onCharLoaded = (res) => {
        setChar(char => res);
-       setLoading(false);
        setImg(res.thumbnail);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
-    const tryIt = () => {
-        setLoading(true);
-        setError(false);
-        updateChar();
-
-
     }
 
 
    const updateChar = () => {
+       clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         // const id = 1
 
-        marvelService
-        .getCharacter(id)
-        .then(res => onCharLoaded(res))
-        .catch(onError);
+        getCharacter(id)
+        .then(res => onCharLoaded(res));
         
 
     }
@@ -83,7 +65,7 @@ const RandomChar = (props) => {
                         Or choose another one
                     </p>
                     <button className="button button__main">
-                        <div onClick={tryIt} className="inner">try it</div>
+                        <div onClick={updateChar} className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
