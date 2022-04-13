@@ -17,7 +17,7 @@ const CharList = (props) => {
 
 
 
-   const {loading, error, getAllCharacters} = useMarvelService();
+   const {loading, error, getAllCharacters, setLoading} = useMarvelService();
 
    useEffect(() => {
     getListChar();
@@ -25,12 +25,12 @@ const CharList = (props) => {
 
 
    const updateListChar= () => {
-        // setLoading(true);
         getAllCharacters(offset).
         then(res => {
             setCharList(res);
             setOffset(offset => offset + 9)
             setCharEnded(res.length < 9 ? true : false)
+            console.log(charList);
         })
     }
 
