@@ -6,6 +6,8 @@ import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
 import Skeleton from '../skeleton/Skeleton';
 import useMarvelService from '../../services/MarvelService';
+import CharSearchForm from '../charSearchForm/CharSearchForm';
+
 
 
 import './charInfo.scss';
@@ -17,7 +19,7 @@ const CharInfo= (props) => {
     // const [error, setError] = useState(false);
     const [img, setImg] = useState('');
     const [clazz, setClazz] = useState('');
-    const [full, setFull] = useState(false);
+    const [full, setFull] = useState(true);
 
 
    const {loading, error, getCharacter, clearError} = useMarvelService()
@@ -68,7 +70,7 @@ const CharInfo= (props) => {
 //        setLoading(true);
 //     }
 
-
+    console.log(full)
     const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
     const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
     const button =  char && char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null;
@@ -85,14 +87,16 @@ const CharInfo= (props) => {
             {spinner}
             {content}
             {button}
+            <CharSearchForm/>
         </div>
+
     )
    
 }
 
 const View = ({char, prop, newComics}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
-
+    console.log(newComics);
 
     return (
         <>
@@ -132,6 +136,7 @@ const View = ({char, prop, newComics}) => {
                 }
 
             </ul>
+
         </>
     )
 }
