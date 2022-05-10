@@ -13,7 +13,6 @@ import CharSearchForm from '../charSearchForm/CharSearchForm';
 import './charInfo.scss';
 
 const CharInfo= (props) => {
-    console.log(props.charId);
     const [char, setChar] = useState(null);
     // const [loading, setLoading] = useState(false);
     // const [error, setError] = useState(false);
@@ -22,7 +21,7 @@ const CharInfo= (props) => {
     const [full, setFull] = useState(true);
 
 
-   const {loading, error, getCharacter, clearError} = useMarvelService()
+   const {loading, error, getCharacter, clearError, process, setProcess} = useMarvelService()
 
 
     useEffect(() => {
@@ -35,9 +34,6 @@ const CharInfo= (props) => {
         if(!charId) {
             return;
         }
-        // onCharLoading();
-
-        // marvelService.
         clearError();
         getCharacter(charId)
         .then(onCharLoaded);
@@ -54,11 +50,34 @@ const CharInfo= (props) => {
         const match = imgPath.match(/available/ig)
         const prop = match ? "char__basics_propContain" : "char__basics_propCover"
         setChar(char);
-        // setLoading(false);
         setImg(char.thumbnail);
         setClazz(prop);
         setFull(false);
+        setProcess('confirmed');
 
+    }
+
+    const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
+    const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
+    const button =  char && char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null;
+
+    const setContent = (process, char) => {
+        switch(process) {
+            case 'waiting':
+                return <Skeleton/>;
+                break
+            case 'loading':
+                return <Spinner/>
+                break
+            case 'confirmed':
+                return  <View char={char} prop={clazz} newComics={newComics.length > 1 ? newComics : defaultList}/>;
+                break;
+            case 'error':
+                return <ErrorMessage/>
+                break
+            default:
+                throw new Error('Unexpected process state');
+        }
     }
 
 //   const onError = () => {
@@ -70,22 +89,22 @@ const CharInfo= (props) => {
 //        setLoading(true);
 //     }
 
-    console.log(full)
-    const newComics = char ?  !full ? char.comics.slice(0, 10) : char.comics : null;
-    const defaultList = [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
-    const button =  char && char.comics.length > 10 ?  <button onClick={onFullList}>Развернуть больше</button> : null;
-    const skeleton = char || loading || error ? null : <Skeleton/>
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char} prop={clazz} newComics={newComics.length > 1 ? newComics : defaultList}/> : null;
+
+    // const skeleton = char || loading || error ? null : <Skeleton/>
+    // const errorMessage = error ? <ErrorMessage/> : null;
+    // const spinner = loading ? <Spinner/> : null;
+    // const content = !(loading || error || !char) ? <View char={char} prop={clazz} newComics={newComics.length > 1 ? newComics : defaultList}/> : null;
 
 
     return (
         <div className="char__info">
-            {skeleton}
+            {/* {skeleton}
             {errorMessage}
             {spinner}
-            {content}
+            {content}*/
+           
+            setContent(process, char)
+            }
             {button}
             <CharSearchForm/>
         </div>
@@ -96,8 +115,6 @@ const CharInfo= (props) => {
 
 const View = ({char, prop, newComics}) => {
     const {name, description, thumbnail, homepage, wiki, comics} = char;
-    console.log(newComics);
-
     return (
         <>
                     <div className="char__basics">
@@ -122,7 +139,6 @@ const View = ({char, prop, newComics}) => {
                 {
                     newComics.map((item, i)=> {
                         const link = item.resourceURI && item.resourceURI !=null ? item.resourceURI : '23733';
-                        console.log(link);
                         const result = link ? link.match(/\d{5}/g) || link.match(/\d{4}/g) : null;
                         return (
                             <Link to={`/comics/${result}`}>
