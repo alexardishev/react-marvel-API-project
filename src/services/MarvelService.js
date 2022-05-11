@@ -54,7 +54,7 @@ const useMarvelService = () => {
             thumbnail: res.thumbnail.path + '.' + res.thumbnail.extension,
             homepage: res.urls[0].url,
             wiki: res.urls[1].url,
-            comics: res.comics.items
+            comics: res.comics.items.length > 1 ? res.comics.items : [{name:'Комиксы отсутствуют у данного персонажа. Пожалуйста сделайте выбор другого персонажа'}]
         }
     }
     const _transformComics = (comics) => {
